@@ -261,6 +261,12 @@ var quickmove = (function() {
         if (excludeArchives && aFolder.isSpecialFolder(Ci.nsMsgFolderFlags.Archive, false)) {
           return;
         }
+
+        // MC 2020.12.24 Escludo la cartella Archivi
+        if (excludeArchives && aFolder.prettyName.toLowerCase().includes("archivi")) {
+          return;
+        }
+        
         addIfRecent(aFolder);
         allFolders.push(aFolder);
         allNames.push(aFolder.prettyName.toLowerCase());
