@@ -5,9 +5,9 @@
 
 (async function() {
   let prefs = await browser.storage.local.get({
-    markAsRead: true,
+    markAsRead: false,
     maxRecentFolders: 15,
-    excludeArchives: false,
+    excludeArchives: true,
   });
 
   for (let [name, value] of Object.entries(prefs)) {

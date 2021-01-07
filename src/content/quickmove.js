@@ -76,8 +76,8 @@ var quickmove = (function() {
 
       await storage.local.set({
         maxRecentFolders: Services.prefs.getIntPref("extensions.quickmove.maxRecentFolders", 15),
-        markAsRead: Services.prefs.getBoolPref("extensions.quickmove.markAsRead", true),
-        excludeArchives: Services.prefs.getBoolPref("extensions.quickmove.excludeArchives", false),
+        markAsRead: Services.prefs.getBoolPref("extensions.quickmove.markAsRead", false),   // MC 2021/01/07 Cambiato default
+        excludeArchives: Services.prefs.getBoolPref("extensions.quickmove.excludeArchives", true),  // MC 2021/01/07 Cambiato default
       });
 
       Services.prefs.clearUserPref("extensions.quickmove.maxRecentFolders");
@@ -221,38 +221,42 @@ var quickmove = (function() {
         let lowerLabel = label.toLowerCase();
 
         if (lowerLabel in fullPathMap) {
-          label = Quickmove.getFullName(folder);
+            label = Quickmove.getFullName(folder).replace(/Posta in arrivo\//i, '').replace(/Posta in arrivo/i, '').replace(/\//g, " / ");
         }
-        
-        // MC 2021/01/07 Non c'e' mai bisogno di visualizzare il server name che e' sempre quello
-        //if (lowerLabel in dupeMap && dupeMap[lowerLabel] > 1) {
-        //  label += " - " + folder.server.prettyName;
-        //}
-        node.setAttribute("label", label);
-        node._folder = folder;
 
-        // MC 2021/01/07 Se la parola che sto cercando esiste interamente nel nome cartella
-        if (targetValue != '' && new RegExp('\\b' + targetValue.toLowerCase() + '\\b', 'i').test(folder.prettyName)) {
-            // Imposto lo stile a grassetto per evidenziare e mostro il risultato per primo
-            node.setAttribute("class", "folderMenuItem menuitem-iconic header");
-            // An exact match, put this at the top after the separator
-            let separator = popup.getElementsByClassName("quickmove-separator")[0];
-            popup.insertBefore(node, separator.nextSibling);
-        } else {
-            // Niente grassetto e accodo il risultato
-            node.setAttribute("class", "folderMenuItem menuitem-iconic");
-            // Otherwise append to the end
-            popup.appendChild(node);
+        if (label) {
+
+            // MC 2021/01/07 Non c'e' mai bisogno di visualizzare il server name che e' sempre quello
+            //if (lowerLabel in dupeMap && dupeMap[lowerLabel] > 1) {
+            //  label += " - " + folder.server.prettyName;
+            //}
+            node.setAttribute("label", label);
+            node._folder = folder;
+
+            // MC 2021/01/07 Se la parola che sto cercando esiste interamente nel nome cartella
+            if (targetValue != '' && new RegExp('\\b' + targetValue.toLowerCase() + '\\b', 'i').test(folder.prettyName)) {
+                // Imposto lo stile a grassetto per evidenziare e mostro il risultato per primo
+                node.setAttribute("class", "folderMenuItem menuitem-iconic header");
+                // An exact match, put this at the top after the separator
+                let separator = popup.getElementsByClassName("quickmove-separator")[0];
+                popup.insertBefore(node, separator.nextSibling);
+            } else {
+                // Niente grassetto e accodo il risultato
+                node.setAttribute("class", "folderMenuItem menuitem-iconic");
+                // Otherwise append to the end
+                popup.appendChild(node);
+            }
+
+            //if (lowerLabel == targetValue.toLowerCase()) {
+            //  // An exact match, put this at the top after the separator
+            //  let separator = popup.getElementsByClassName("quickmove-separator")[0];
+            //  popup.insertBefore(node, separator.nextSibling);
+            //} else {
+            //  // Otherwise append to the end
+            //  popup.appendChild(node);
+            //}
 		}
-
-        //if (lowerLabel == targetValue.toLowerCase()) {
-        //  // An exact match, put this at the top after the separator
-        //  let separator = popup.getElementsByClassName("quickmove-separator")[0];
-        //  popup.insertBefore(node, separator.nextSibling);
-        //} else {
-        //  // Otherwise append to the end
-        //  popup.appendChild(node);
-        //}
+        
       }
     },
 
@@ -283,7 +287,11 @@ var quickmove = (function() {
         if (excludeArchives && aFolder.prettyName.toLowerCase().includes("archivi")) {
           return;
         }
-        
+        // MC 2020.12.24 Escludo la cartella dell'account kidmar
+        if (excludeArchives && ! aFolder.server.prettyName.toLowerCase().includes("kubesistemi")) {
+          return;
+        }
+
         addIfRecent(aFolder);
         allFolders.push(aFolder);
         allNames.push(aFolder.prettyName.toLowerCase());
@@ -327,7 +335,7 @@ var quickmove = (function() {
       let oldestTime = 0;
 
       let maxRecent = await Quickmove.getPref("maxRecentFolders", 15);
-      let excludeArchives = await Quickmove.getPref("excludeArchives", false);
+      let excludeArchives = await Quickmove.getPref("excludeArchives", true);
 
       for (let acct of fixIterator(MailServices.accounts.accounts, Ci.nsIMsgAccount)) {
         if (acct.incomingServer) {
@@ -386,7 +394,7 @@ var quickmove = (function() {
       if (copyNotMove) {
         MsgCopyMessage(folder);
       } else {
-        if (await Quickmove.getPref("markAsRead", true)) {
+        if (await Quickmove.getPref("markAsRead", false)) {
           MsgMarkMsgAsRead(true);
         }
         MsgMoveMessage(folder);
