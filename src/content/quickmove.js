@@ -231,15 +231,28 @@ var quickmove = (function() {
         node.setAttribute("label", label);
         node._folder = folder;
 
-        node.setAttribute("class", "folderMenuItem menuitem-iconic");
-        if (lowerLabel == targetValue.toLowerCase()) {
-          // An exact match, put this at the top after the separator
-          let separator = popup.getElementsByClassName("quickmove-separator")[0];
-          popup.insertBefore(node, separator.nextSibling);
+        // MC 2021/01/07 Se la parola che sto cercando esiste interamente nel nome cartella
+        if (targetValue != '' && new RegExp('\\b' + targetValue.toLowerCase() + '\\b', 'i').test(folder.prettyName)) {
+            // Imposto lo stile a grassetto per evidenziare e mostro il risultato per primo
+            node.setAttribute("class", "folderMenuItem menuitem-iconic header");
+            // An exact match, put this at the top after the separator
+            let separator = popup.getElementsByClassName("quickmove-separator")[0];
+            popup.insertBefore(node, separator.nextSibling);
         } else {
-          // Otherwise append to the end
-          popup.appendChild(node);
-        }
+            // Niente grassetto e accodo il risultato
+            node.setAttribute("class", "folderMenuItem menuitem-iconic");
+            // Otherwise append to the end
+            popup.appendChild(node);
+		}
+
+        //if (lowerLabel == targetValue.toLowerCase()) {
+        //  // An exact match, put this at the top after the separator
+        //  let separator = popup.getElementsByClassName("quickmove-separator")[0];
+        //  popup.insertBefore(node, separator.nextSibling);
+        //} else {
+        //  // Otherwise append to the end
+        //  popup.appendChild(node);
+        //}
       }
     },
 
