@@ -198,13 +198,16 @@ var quickmove = (function() {
         }
 
         if (
-          lowerName in serverMap &&
-          serverLowerName in serverMap[lowerName] &&
-          serverMap[lowerName][serverLowerName]
+            lowerName in serverMap &&
+            serverLowerName in serverMap[lowerName] &&
+            serverMap[lowerName][serverLowerName]
         ) {
-          // Already in the server map, this folder needs the full path
-          fullPathMap[lowerName] = true;
-        }
+            // Already in the server map, this folder needs the full path
+            fullPathMap[lowerName] = true;
+        } else {
+            // MC 2021/01/07 Setto comunque il flag, in modo che i risultati siano consistenti
+            fullPathMap[lowerName] = true;
+		}
 
         serverMap[lowerName][serverLowerName] = true;
         dupeMap[lowerName]++;
@@ -220,10 +223,11 @@ var quickmove = (function() {
         if (lowerLabel in fullPathMap) {
           label = Quickmove.getFullName(folder);
         }
-
-        if (lowerLabel in dupeMap && dupeMap[lowerLabel] > 1) {
-          label += " - " + folder.server.prettyName;
-        }
+        
+        // MC 2021/01/07 Non c'è mai bisogno di visualizzare il server name che è sempre quello
+        //if (lowerLabel in dupeMap && dupeMap[lowerLabel] > 1) {
+        //  label += " - " + folder.server.prettyName;
+        //}
         node.setAttribute("label", label);
         node._folder = folder;
 
