@@ -224,7 +224,7 @@ var quickmove = (function() {
           label = Quickmove.getFullName(folder);
         }
         
-        // MC 2021/01/07 Non c'è mai bisogno di visualizzare il server name che è sempre quello
+        // MC 2021/01/07 Non c'e' mai bisogno di visualizzare il server name che e' sempre quello
         //if (lowerLabel in dupeMap && dupeMap[lowerLabel] > 1) {
         //  label += " - " + folder.server.prettyName;
         //}
