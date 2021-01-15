@@ -17,6 +17,8 @@ REM Creo l'archivio contenente tutto il compilato
 cd src
 "%Path7Z%" a -r -tzip -mx=1 %fullZipFilePath% *.*
 
+cd ..
+
 REM Apro una cartella di explorer mostrando il file
 Explorer /select, %fullZipFilePath%
 

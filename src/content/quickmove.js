@@ -213,6 +213,14 @@ var quickmove = (function() {
         dupeMap[lowerName]++;
       }
 
+      let firstStartsWithGroup = null;      // Comincia con i caratteri cercati ed e' nella cartella Assistenza
+      let secondStartsWithGroup = null;     // Comincia con i caratteri cercati ma NON e' nella cartella Assistenza
+      let thirdNoMatchGroup = null;         // NON comincia con i caratteri cercati ed e' nella cartella Assistenza
+      let fourthNoMatchGroup = null;        // NON comincia con i caratteri cercati e NON e' nella cartella Assistenza
+        // MC 2021/01/15 L'obiettivo è creare questa "ORDER BY":
+        // 1) Cartelle il cui nome inizia con le lettere cercate
+        // 2) Cartelle che stanno nella cartella Assistenza
+
       // Now add each folder, appending the server name if the folder name
       // itself would appear more than once.
       for (let folder of folders) {
@@ -234,13 +242,78 @@ var quickmove = (function() {
             node._folder = folder;
 
             // MC 2021/01/07 Se la parola che sto cercando esiste interamente nel nome cartella
-            if (targetValue != '' && new RegExp('\\b' + targetValue.toLowerCase() + '\\b', 'i').test(folder.prettyName)) {
+            if (targetValue != '' && new RegExp('\\b' + targetValue.toLowerCase() + '\\b', 'i').test(folder.prettyName.toLowerCase())) {
                 // Imposto lo stile a grassetto per evidenziare e mostro il risultato per primo
                 node.setAttribute("class", "folderMenuItem menuitem-iconic header");
                 // An exact match, put this at the top after the separator
                 let separator = popup.getElementsByClassName("quickmove-separator")[0];
                 popup.insertBefore(node, separator.nextSibling);
-            } else {
+            } else if (targetValue != '' && new RegExp('\\b' + targetValue.toLowerCase(), 'i').test(folder.prettyName.toLowerCase())) {
+                // Il nome della cartella comincia con le lettere cercate
+                // Se e' nella cartella assistenza la mostro per prima
+                if (Quickmove.getFullName(folder).includes("/Assistenza/")) {
+                    if (firstStartsWithGroup === null) {
+                        firstStartsWithGroup = node;
+                    }
+
+                    // Grassetto
+                    node.setAttribute("class", "folderMenuItem menuitem-iconic header");
+
+                    if (secondStartsWithGroup != null) {
+                        popup.insertBefore(node, secondStartsWithGroup);
+                    }
+                    else if (thirdNoMatchGroup != null) {
+                        popup.insertBefore(node, thirdNoMatchGroup);
+                    } else if (fourthNoMatchGroup != null) {
+                        popup.insertBefore(node, fourthNoMatchGroup);
+                    } else {
+                        // Otherwise append to the end
+                        popup.appendChild(node);
+					}
+                }
+                else {
+                    if (secondStartsWithGroup === null) {
+                        secondStartsWithGroup = node;
+                    }
+
+                    // Niente grassetto
+                    node.setAttribute("class", "folderMenuItem menuitem-iconic");
+
+                    if (thirdNoMatchGroup != null) {
+                        popup.insertBefore(node, thirdNoMatchGroup);
+                    } else if (fourthNoMatchGroup != null) {
+                        popup.insertBefore(node, fourthNoMatchGroup);
+                    } else {
+                        // Otherwise append to the end
+                        popup.appendChild(node);
+                    }
+				}
+			}
+            else {
+                // Niente grassetto
+                node.setAttribute("class", "folderMenuItem menuitem-iconic");
+
+                // La cartella contiene le lettere cercate ma in mezzo alle parole
+                if (Quickmove.getFullName(folder).includes("/Assistenza/")) {
+                    if (thirdNoMatchGroup === null) {
+                        thirdNoMatchGroup = node;
+                    }
+
+                    if (fourthNoMatchGroup != null) {
+                        popup.insertBefore(node, fourthNoMatchGroup);
+                    } else {
+                        // Otherwise append to the end
+                        popup.appendChild(node);
+                    }
+                }
+                else {
+                    if (fourthNoMatchGroup === null) {
+                        fourthNoMatchGroup = node;
+                    }
+
+                    // Otherwise append to the end
+                    popup.appendChild(node);
+				}
                 // Niente grassetto e accodo il risultato
                 node.setAttribute("class", "folderMenuItem menuitem-iconic");
                 // Otherwise append to the end

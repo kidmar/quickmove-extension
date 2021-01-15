@@ -1,9 +1,11 @@
 {
   "ExpandedNodes": [
     "",
-    "\\src",
-    "\\src\\content"
+    "\\src\\api",
+    "\\src\\content",
+    "\\src\\options",
+    "\\src\\_locales"
   ],
-  "SelectedNode": "\\src\\content\\quickmove.js",
+  "SelectedNode": "\\CreateXPI.bat",
   "PreviewInSolutionExplorer": false
 }
