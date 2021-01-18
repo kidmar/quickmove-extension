@@ -221,6 +221,8 @@ var quickmove = (function () {
 			// 1) Cartelle il cui nome inizia con le lettere cercate
 			// 2) Cartelle che stanno nella cartella Assistenza
 
+			console.log("Ricerca effettuata: " + targetValue);
+
 			// Now add each folder, appending the server name if the folder name
 			// itself would appear more than once.
 			for (let folder of folders) {
@@ -248,6 +250,8 @@ var quickmove = (function () {
 						// An exact match, put this at the top after the separator
 						let separator = popup.getElementsByClassName("quickmove-separator")[0];
 						popup.insertBefore(node, separator.nextSibling);
+
+						console.log("Aggiunto al gruppo 0 il valore '" + Quickmove.getFullName(folder) + "'");
 					} else if (targetValue != '' && new RegExp('\\b' + targetValue.toLowerCase(), 'i').test(folder.prettyName.toLowerCase())) {
 						// Il nome della cartella comincia con le lettere cercate
 						// Se e' nella cartella assistenza la mostro per prima
@@ -256,18 +260,27 @@ var quickmove = (function () {
 								firstStartsWithGroup = node;
 							}
 
+							console.log("Aggiunto al gruppo 1 il valore '" + Quickmove.getFullName(folder) + "'");
+
 							// Grassetto
 							node.setAttribute("class", "folderMenuItem menuitem-iconic header");
 
 							if (secondStartsWithGroup != null) {
+								console.log("Inserisco elemento del gruppo 1 prima di questo elemento 2:");
+								console.log(secondStartsWithGroup);
 								popup.insertBefore(node, secondStartsWithGroup);
 							}
 							else if (thirdNoMatchGroup != null) {
+								console.log("Inserisco elemento del gruppo 1 prima di questo elemento 3:");
+								console.log(thirdNoMatchGroup);
 								popup.insertBefore(node, thirdNoMatchGroup);
 							} else if (fourthNoMatchGroup != null) {
+								console.log("Inserisco elemento del gruppo 1 prima di questo elemento 4:");
+								console.log(thirdNoMatchGroup);
 								popup.insertBefore(node, fourthNoMatchGroup);
 							} else {
 								// Otherwise append to the end
+								console.log("Inserisco elemento del gruppo 1 in fondo");
 								popup.appendChild(node);
 							}
 						}
@@ -276,15 +289,22 @@ var quickmove = (function () {
 								secondStartsWithGroup = node;
 							}
 
+							console.log("Aggiunto al gruppo 2 il valore '" + Quickmove.getFullName(folder) + "'");
+
 							// Niente grassetto
 							node.setAttribute("class", "folderMenuItem menuitem-iconic");
 
 							if (thirdNoMatchGroup != null) {
+								console.log("Inserisco elemento del gruppo 2 prima di questo elemento 3:");
+								console.log(thirdNoMatchGroup);
 								popup.insertBefore(node, thirdNoMatchGroup);
 							} else if (fourthNoMatchGroup != null) {
+								console.log("Inserisco elemento del gruppo 2 prima di questo elemento 4:");
+								console.log(fourthNoMatchGroup);
 								popup.insertBefore(node, fourthNoMatchGroup);
 							} else {
 								// Otherwise append to the end
+								console.log("Inserisco elemento del gruppo 2 in fondo");
 								popup.appendChild(node);
 							}
 						}
@@ -299,10 +319,15 @@ var quickmove = (function () {
 								thirdNoMatchGroup = node;
 							}
 
+							console.log("Aggiunto al gruppo 3 il valore '" + Quickmove.getFullName(folder) + "'");
+
 							if (fourthNoMatchGroup != null) {
+								console.log("Inserisco elemento del gruppo 3 prima di questo elemento 4:");
+								console.log(fourthNoMatchGroup);
 								popup.insertBefore(node, fourthNoMatchGroup);
 							} else {
 								// Otherwise append to the end
+								console.log("Inserisco elemento del gruppo 3 in fondo");
 								popup.appendChild(node);
 							}
 						}
@@ -311,25 +336,15 @@ var quickmove = (function () {
 								fourthNoMatchGroup = node;
 							}
 
+							console.log("Aggiunto al gruppo 4 il valore '" + Quickmove.getFullName(folder) + "'");
+
 							// Otherwise append to the end
+							console.log("Inserisco elemento del gruppo 4 in fondo");
 							popup.appendChild(node);
 						}
-						// Niente grassetto e accodo il risultato
-						node.setAttribute("class", "folderMenuItem menuitem-iconic");
-						// Otherwise append to the end
-						popup.appendChild(node);
 					}
-
-					//if (lowerLabel == targetValue.toLowerCase()) {
-					//  // An exact match, put this at the top after the separator
-					//  let separator = popup.getElementsByClassName("quickmove-separator")[0];
-					//  popup.insertBefore(node, separator.nextSibling);
-					//} else {
-					//  // Otherwise append to the end
-					//  popup.appendChild(node);
-					//}
+					// MC 2021/01/18 Fix, era rimasta una append sporca dal codice vecchio che rompeva alcuni ordinamenti
 				}
-
 			}
 		},
 
