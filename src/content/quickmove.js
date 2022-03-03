@@ -8,7 +8,7 @@
 
 "use strict";
 
-var quickmove = (function () {
+var quickmove = (function() {
 	const ADDON_ID = "quickmove@mozilla.kewis.ch";
 
 	let { MultiSuffixTree } = ChromeUtils.import("resource:///modules/gloda/SuffixTree.jsm");
@@ -39,11 +39,11 @@ var quickmove = (function () {
 			}
 		},
 
-		getString: function (aName) {
+		getString: function(aName) {
 			return this.getWXAPI("i18n", true).getMessage(aName);
 		},
 
-		getFullName: function (aFolder) {
+		getFullName: function(aFolder) {
 			let folder = aFolder;
 			let fullPath = [];
 
@@ -58,20 +58,20 @@ var quickmove = (function () {
 		/**
 		 * Clear all items except the menuseparator and the search box
 		 */
-		clearItems: function (popup) {
+		clearItems: function(popup) {
 			while (popup.lastChild.className != "quickmove-separator") {
 				popup.removeChild(popup.lastChild);
 			}
 		},
 
-		getPref: async function (name, defaultValue = null) {
+		getPref: async function(name, defaultValue = null) {
 			let storage = await this.getWXAPI("storage");
 			let prefs = await storage.local.get({ [name]: defaultValue });
 
 			return prefs[name];
 		},
 
-		migrateStorage: async function () {
+		migrateStorage: async function() {
 			let storage = await this.getWXAPI("storage");
 
 			await storage.local.set({
@@ -85,11 +85,11 @@ var quickmove = (function () {
 			Services.prefs.clearUserPref("extensions.quickmove.excludeArchives");
 		},
 
-		debounce: function (func, wait, immediate) {
+		debounce: function(func, wait, immediate) {
 			// https://davidwalsh.name/javascript-debounce-function (MIT license from underscore)
 			// Some adaptions to be more ES6-like and satisfy eslint
 			let timeout;
-			return function (...args) {
+			return function(...args) {
 				let callNow = immediate && !timeout;
 				clearTimeout(timeout);
 
@@ -131,7 +131,7 @@ var quickmove = (function () {
 		 * Event listener method to be called when the 'move to' or 'copy to'
 		 * context menu is shown.
 		 */
-		popupshowing: function (event) {
+		popupshowing: function(event) {
 			if (event.target.getAttribute("ignorekeys") != "true") {
 				// If we are showing the menuitems, then don't set up the folders but
 				// keep the old list.
@@ -165,7 +165,7 @@ var quickmove = (function () {
 			event.stopPropagation();
 		},
 
-		popupshown: function (event) {
+		popupshown: function(event) {
 			// focus the textbox
 			event.target.setAttribute("ignorekeys", "true");
 			event.target.firstChild.focus();
@@ -178,10 +178,13 @@ var quickmove = (function () {
 		 * @param popup       The popup to add to
 		 * @param targetValue The searched text
 		 */
-		addFolders: function (folders, popup, targetValue) {
+		addFolders: async function(folders, popup, targetValue) {
 			let dupeMap = {};
 			let serverMap = {};
 			let fullPathMap = {};
+			let alwaysShowFullPath = await Quickmove.getPref("alwaysShowFullPath", false);
+			let alwaysShowMailbox = await Quickmove.getPref("alwaysShowMailbox", false);
+			let doNotCrop = await Quickmove.getPref("doNotCrop", false);
 
 			// First create a map of pretty names to find possible duplicates.
 			for (let folder of folders) {
@@ -227,10 +230,13 @@ var quickmove = (function () {
 			// itself would appear more than once.
 			for (let folder of folders) {
 				let node = document.createXULElement("menuitem");
+				if (doNotCrop) {
+				  node.setAttribute("crop", "none");
+				}
 				let label = folder.prettyName;
 				let lowerLabel = label.toLowerCase();
 
-				if (lowerLabel in fullPathMap) {
+				if (lowerLabel in fullPathMap || alwaysShowFullPath) {
 					label = Quickmove.getFullName(folder).replace(/Posta in arrivo\//i, '').replace(/Posta in arrivo/i, '').replace(/\//g, " / ");
 				}
 
@@ -351,7 +357,7 @@ var quickmove = (function () {
 		/**
 		 * Prepare the recent folders and the suffix tree with all available folders.
 		 */
-		prepareFolders: async function () {
+		prepareFolders: async function() {
 			function sorter(a, b) {
 				let atime = Number(a.getStringProperty("MRUTime")) || 0;
 				let btime = Number(b.getStringProperty("MRUTime")) || 0;
@@ -385,9 +391,8 @@ var quickmove = (function () {
 				allNames.push(aFolder.prettyName.toLowerCase());
 
 				if (aFolder.hasSubFolders) {
-					let myenum = aFolder.subFolders;
-					while (myenum.hasMoreElements()) {
-						processFolder(myenum.getNext().QueryInterface(Ci.nsIMsgFolder), excludeArchives);
+					for (let xFolder of aFolder.subFolders) {
+						processFolder(xFolder, excludeArchives);
 					}
 				}
 			}
@@ -423,9 +428,9 @@ var quickmove = (function () {
 			let oldestTime = 0;
 
 			let maxRecent = await Quickmove.getPref("maxRecentFolders", 15);
-			let excludeArchives = await Quickmove.getPref("excludeArchives", true);
+			let excludeArchives = await Quickmove.getPref("excludeArchives", false);
 
-			for (let acct of fixIterator(MailServices.accounts.accounts, Ci.nsIMsgAccount)) {
+			for (let acct of MailServices.accounts.accounts) {
 				if (acct.incomingServer) {
 					processFolder(acct.incomingServer.rootFolder, excludeArchives);
 				}
@@ -440,13 +445,11 @@ var quickmove = (function () {
 		 * Perform a search. If no search term is entered, the recent folders are
 		 * shown, otherwise folders which match the search term are shown.
 		 */
-		search: function (textboxNode) {
+		search: function(textboxNode) {
 			let popup = textboxNode.parentNode;
 			Quickmove.clearItems(popup);
 			dump(`=== text |${textboxNode.value}|\n`);
-			if (textboxNode.value.length == 0) {
-				quickmove.addFolders(quickmove.recentFolders, popup, textboxNode.value);
-			} else {
+			if (textboxNode.value.length) {
 				let folders = quickmove.suffixTree
 					.findMatches(textboxNode.value.toLowerCase())
 					.filter(x => x.canFileMessages);
@@ -459,6 +462,8 @@ var quickmove = (function () {
 					node.setAttribute("label", Quickmove.getString("noResults"));
 					popup.appendChild(node);
 				}
+			} else {
+				quickmove.addFolders(quickmove.recentFolders, popup, textboxNode.value);
 			}
 
 			// The search is done, reset the dirty count and call the search complete
@@ -474,31 +479,31 @@ var quickmove = (function () {
 			quickmove.search(textboxNode);
 		}, 500),
 
-		executeCopy: function (folder) {
+		executeCopy: function(folder) {
 			quickmove.executeMove(folder, true);
 		},
 
-		executeMove: async function (folder, copyNotMove) {
+		executeMove: async function(folder, copyNotMove) {
 			if (copyNotMove) {
 				MsgCopyMessage(folder);
 			} else {
-				if (await Quickmove.getPref("markAsRead", false)) {
+				if (await Quickmove.getPref("markAsRead", true)) {
 					MsgMarkMsgAsRead(true);
 				}
 				MsgMoveMessage(folder);
 			}
 		},
 
-		executeGoto: function (folder) {
+		executeGoto: function(folder) {
 			gFolderTreeView.selectFolder(folder, true);
 		},
 
-		focus: function (event) {
+		focus: function(event) {
 			let popup = event.target.parentNode;
 			popup.setAttribute("ignorekeys", "true");
 		},
 
-		keypress: function (event, executeFunc) {
+		keypress: function(event, executeFunc) {
 			let popup = event.target.parentNode;
 
 			// Executor function used later to execute the actual action
@@ -574,14 +579,14 @@ var quickmove = (function () {
 			event.preventDefault();
 		},
 
-		command: function (event, executeFunc, isContext = false) {
+		command: function(event, executeFunc, isContext = false) {
 			let popup = event.target.parentNode;
 			executeFunc(event.target._folder);
 			event.stopPropagation();
 			quickmove.hide(popup, isContext);
 		},
 
-		openFile: function () {
+		openFile: function() {
 			let filebutton = document.getElementById("button-file");
 			let threadTree = document.getElementById("threadTree");
 			let messagepane = document.getElementById("messagepane");
@@ -606,7 +611,7 @@ var quickmove = (function () {
 			}
 		},
 
-		openGoto: function () {
+		openGoto: function() {
 			let folderLocation = document.getElementById("locationFolders");
 			let folderTree = document.getElementById("folderTree");
 
@@ -620,7 +625,7 @@ var quickmove = (function () {
 			}
 		},
 
-		openCopy: function () {
+		openCopy: function() {
 			let threadTree = document.getElementById("threadTree");
 			let messagepane = document.getElementById("messagepane");
 			if (threadTree) {
@@ -640,7 +645,7 @@ var quickmove = (function () {
 			}
 		},
 
-		hide: function (popup, isContext = false) {
+		hide: function(popup, isContext = false) {
 			if (!isContext) {
 				popup.hidePopup();
 			}
