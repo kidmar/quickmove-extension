@@ -1,12 +1,6 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\src",
-    "\\src\\api",
-    "\\src\\content",
-    "\\src\\options",
-    "\\src\\_locales"
+    ""
   ],
-  "SelectedNode": "\\CreateXPI.bat",
   "PreviewInSolutionExplorer": false
 }
