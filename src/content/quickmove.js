@@ -381,8 +381,8 @@ var quickmove = (function() {
 				if (excludeArchives && aFolder.prettyName.toLowerCase().includes("archivi")) {
 					return;
 				}
-				// MC 2020.12.24 Escludo la cartella dell'account kidmar
-				if (excludeArchives && !aFolder.server.prettyName.toLowerCase().includes("kubesistemi")) {
+				// MC 2020.12.24 Includo solo l'account principale
+				if (excludeArchives && !aFolder.server.prettyName.toLowerCase().includes("marco conca")) {
 					return;
 				}
 
@@ -428,7 +428,7 @@ var quickmove = (function() {
 			let oldestTime = 0;
 
 			let maxRecent = await Quickmove.getPref("maxRecentFolders", 15);
-			let excludeArchives = await Quickmove.getPref("excludeArchives", false);
+			let excludeArchives = await Quickmove.getPref("excludeArchives", true);  // MC 2021/01/07 Cambiato default
 
 			for (let acct of MailServices.accounts.accounts) {
 				if (acct.incomingServer) {
