@@ -4,7 +4,8 @@
  * Portions Copyright (C) Philipp Kewisch, 2019 */
 
 html, body {
-  margin-top: 1ex;
+	margin-top: 1ex;
+	margin-bottom: 1ex;
 }
 
 .browser-style > input[type="checkbox"]:checked + label::before {
