@@ -190,6 +190,7 @@ var quickmove = (function() {
 			for (let folder of folders) {
 				let lowerName = folder.prettyName.toLowerCase();
 				let serverLowerName = folder.server.prettyName.toLowerCase();
+				//console.log("Aggiunta cartella: " + lowerName);
 
 				if (!(lowerName in serverMap)) {
 					serverMap[lowerName] = {};
@@ -373,14 +374,19 @@ var quickmove = (function() {
 			 * @param excludeArchives  if Archives folder must be excluded
 			 */
 			function processFolder(aFolder, excludeArchives) {
+				//console.log("processFolder su: " + aFolder.prettyName.toLowerCase());
+
 				if (excludeArchives && aFolder.isSpecialFolder(Ci.nsMsgFolderFlags.Archive, false)) {
 					return;
 				}
 
 				// MC 2020.12.24 Escludo la cartella Archivi
-				if (excludeArchives && aFolder.prettyName.toLowerCase().includes("archivi")) {
-					return;
-				}
+				// MC 2022/06/09 Non lo faccio più, in teoria l'istruzione qua sopra lo fa già
+				// e lo fa in modo corretto, non guardando il nome della cartella
+				//if (excludeArchives && aFolder.prettyName.toLowerCase().includes("archivi")) {
+				//	return;
+				//}
+
 				// MC 2020.12.24 Includo solo l'account principale
 				if (excludeArchives && !aFolder.server.prettyName.toLowerCase().includes("marco conca")) {
 					return;
