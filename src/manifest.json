@@ -2,47 +2,73 @@
   "manifest_version": 2,
   "name": "__MSG_extensionName__",
   "description": "__MSG_extensionDescription__",
-  "version": "1.10.0",
+  "version": "2.8.0",
   "default_locale": "en",
   "author": "Philipp Kewisch",
-  "applications": {
-    "gecko": {
-      "id": "quickmove@mozilla.kewis.ch",
-      "strict_min_version": "91.0a1"
-    }
-  },
   "browser_specific_settings": {
     "gecko": {
       "id": "quickmove@mozilla.kewis.ch",
-      "strict_min_version": "91.0a1"
+      "strict_min_version": "115.0a1",
+      "strict_max_version": "119.*"
     }
   },
   "icons": {
-    "32": "icon.png"
+    "32": "images/addon.svg"
   },
+
   "options_ui": {
-    "page": "options/options.html",
-    "browser_style": true
+    "page": "options/options.html"
   },
+
+  "background": {
+    "scripts": ["background.js"]
+  },
+
+
   "permissions": [
-    "storage"
+    "storage",
+    "accountsRead",
+    "messagesRead",
+    "messagesMove"
   ],
+  "browser_action": {
+    "default_icon": "images/addon.svg",
+    "default_popup": "popup/popup.html?action=move&allowed=move,copy,goto,tag",
+    "default_label": "__MSG_extensionShortName__"
+  },
+
+  "message_display_action": {
+    "default_icon": "images/addon.svg",
+    "default_popup": "popup/popup.html?action=move&allowed=move,copy,goto,tag",
+    "default_label": "__MSG_extensionShortName__"
+  },
+
+  "commands": {
+    "move": {
+      "description": "__MSG_commandMoveDescription__",
+      "suggested_key": {
+        "default": "Ctrl+Shift+N",
+        "mac": "MacCtrl+Shift+M"
+      }
+    },
+    "copy": {
+      "description": "__MSG_commandCopyDescription__"
+    },
+    "goto": {
+      "description": "__MSG_commandGotoDescription__"
+    },
+    "tag": {
+      "description": "__MSG_commandTagDescription__"
+    }
+  },
+
   "experiment_apis": {
     "quickmove": {
       "schema": "api/schema.json",
       "parent": {
-        "scopes": [
-          "addon_parent"
-        ],
-        "script": "api/quickmove.js",
-        "events": [
-          "startup"
-        ],
-        "paths": [
-          [
-            "quickmove"
-          ]
-        ]
+        "scopes": ["addon_parent"],
+        "paths": [["quickmove"]],
+        "script": "api/api.js"
       }
     }
   }

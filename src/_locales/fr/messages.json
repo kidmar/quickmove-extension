@@ -1,29 +1,92 @@
 {
   "extensionName": {
-    "message": "Déplacement rapide"
+    "message": "Quick Folder Move"
   },
   "extensionDescription": {
-    "message": "Déplacez rapidement les messages dans d'autres dossiers au clavier"
+    "message": "Déplace rapidement vos messages dans d'auters dossiers en utilisant le clavier"
+  },
+  "extensionShortName": {
+    "message": "Quick Move"
+  },
+  "commandMoveDescription": {
+    "message": "Déplacer les messages sélectionnés"
+  },
+  "commandCopyDescription": {
+    "message": "Copier les messages sélectionnés"
+  },
+  "commandGotoDescription": {
+    "message": "Aller au dossier"
+  },
+  "commandTagDescription": {
+    "message": "Appliquer une étiquette"
+  },
+  "actionMove": {
+    "message": "Déplacer"
+  },
+  "actionCopy": {
+    "message": "Copier"
+  },
+  "actionGoto": {
+    "message": "Aller"
+  },
+  "actionTag": {
+    "message": "Étiqueter"
+  },
+  "layout": {
+    "message": "Disposition de la fenêtre contextuelle"
+  },
+  "layout.title": {
+    "message": ""
+  },
+  "layout.auto": {
+    "message": "Automatique"
+  },
+  "layout.auto.title": {
+    "message": ""
+  },
+  "layout.wide": {
+    "message": "Toujours large"
+  },
+  "layout.wide.title": {
+    "message": ""
+  },
+  "layout.compact": {
+    "message": "Toujours compact"
+  },
+  "layout.compact.title": {
+    "message": ""
   },
   "markAsRead": {
-    "message": "Marquer les messages comme lus lors du déplacement"
+    "message": "Marque les messages comme lu après le déplacement"
   },
   "markAsRead.title": {
+    "message": ""
+  },
+  "showFolderPath": {
+    "message": "Affiche le chemin complet de chaque dossier dans la boîte de recherche"
+  },
+  "showFolderPath.title": {
+    "message": ""
+  },
+  "skipArchive": {
+    "message": "Ne jamais correspondre aux dossiers archivés"
+  },
+  "skipArchive.title": {
     "message": ""
   },
   "maxRecentFolders": {
     "message": "Nombre de dossiers récents"
   },
   "maxRecentFolders.title": {
-    "message": "Modifie le nombre de dossiers récents affichés lorsque aucun texte de recherche n'est saisi."
+    "message": "Modifie le nombre de dossiers récents à afficher lorsqu'aucun critère de recherche n'est entré."
   },
-  "noResults": {
-    "message": "<pas de résultats>"
+  "useLegacyShortcuts": {
+    "message": "Utiliser les raccourcis clavier classiques"
   },
-  "excludeArchives": {
-    "message": "Exclure le dossier des Archives des résultats de recherche"
+  "useLegacyShortcuts.title": {
+    "message": "Utilisez ⇧M comme raccourci pour déplacer les messages"
   },
-  "excludeArchives.title": {
-    "message": ""
+  "useLegacyShortcutsDone": {
+    "message": "Vous pouvez à présent utiliser ⇧M ⇧Y et ⇧G. Utilisez l'extention shortcut pour les modifier."
   }
 }

@@ -1,36 +1,16 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * Portions Copyright (C) Philipp Kewisch, 2019 */
 "use strict";
 
-const xpcshellTestConfig = require("eslint-plugin-mozilla/lib/configs/xpcshell-test.js");
-const browserTestConfig = require("eslint-plugin-mozilla/lib/configs/browser-test.js");
-
 module.exports = {
-  "root": true,
-  "env": {
-    "es6": true,
-    "webextensions": true,
+  env: {
+    es6: true,
+    webextensions: true
   },
-  "parser": "babel-eslint",
-
-  "parserOptions": {
-    "ecmaVersion": 11
+  parserOptions: {
+    ecmaVersion: 13,
+    sourceType: "module"
   },
-
-  "globals": {
-    "messenger": true
-  },
-
-  "extends": [
-    "plugin:mozilla/recommended",
-  ],
-  "plugins": [
-    "mozilla",
-  ],
-
-  "rules": {
+  globals: { self: true },
+  rules: {
     // Enforce one true brace style (opening brace on the same line)
     // Allow single line (for now) because of the vast number of changes needed
     "brace-style": [2, "1tbs", { allowSingleLine: true }],
@@ -51,11 +31,11 @@ module.exports = {
     // Enforce one true comma style.
     "comma-style": [2, "last"],
 
-    // We should get better at complexity, but at the moment it is what it is
-    complexity: [2, 90],
-
     // Enforce curly brace conventions for all control statements.
-    curly: 2,
+    "curly": 2,
+
+    // Enforce the spacing around the * in generator functions.
+    "generator-star-spacing": [2, "after"],
 
     // Require space before/after arrow function's arrow
     "arrow-spacing": [2, { before: true, after: true }],
@@ -119,9 +99,6 @@ module.exports = {
     // Disallow reassignments of native objects.
     "no-native-reassign": 2,
 
-    // Disallow nested ternary expressions, they make the code hard to read.
-    "no-nested-ternary": 2,
-
     // Disallow use of octal literals.
     "no-octal": 2,
 
@@ -157,13 +134,13 @@ module.exports = {
     "no-void": 2,
 
     // Disallow Yoda conditions (where literal value comes first).
-    yoda: 2,
+    "yoda": 2,
 
     // Require a space immediately following the // in a line comment.
     "spaced-comment": [2, "always"],
 
     // Require use of the second argument for parseInt().
-    radix: 2,
+    "radix": 2,
 
     // Require spaces before/after unary operators (words on by default,
     // nonwords off by default).
@@ -178,12 +155,11 @@ module.exports = {
     // Disallow use of multiple spaces (sometimes used to align const values,
     // array or object items, etc.). It's hard to maintain and doesn't add that
     // much benefit.
-    "no-multi-spaces": [2, { ignoreEOLComments: true }],
+    "no-multi-spaces": 2,
 
     // Require spaces around operators, except for a|0.
     // Disabled for now given eslint doesn't support default args yet
-    // "space-infix-ops": [2, { "int32Hint": true }],
-    "space-infix-ops": 0,
+    // "space-infix-ops": [2, {"int32Hint": true}],
 
     // Require a space around all keywords.
     "keyword-spacing": 2,
@@ -219,7 +195,7 @@ module.exports = {
     "no-unreachable": 2,
 
     // Always require use of semicolons wherever they are valid.
-    semi: [2, "always"],
+    "semi": [2, "always"],
 
     // Disallow empty statements. This will report an error for:
     // try { something(); } catch (e) {}
@@ -241,13 +217,9 @@ module.exports = {
     // We use var-only-at-top-level instead of no-var as we allow top level
     // vars.
     "no-var": 0,
-    "mozilla/var-only-at-top-level": 1,
 
     // Disallow global and local variables that aren't used, but allow unused function arguments.
-    //"no-unused-vars": [2, { vars: "all", args: "none", varsIgnorePattern: "EXPORTED_SYMBOLS" }],
-    "no-unused-vars": 0,
-
-    "mozilla/mark-test-function-used": 1,
+    "no-unused-vars": [2, { vars: "all", args: "none", varsIgnorePattern: "EXPORTED_SYMBOLS|rest" }],
 
     // Require padding inside curly braces
     "object-curly-spacing": [2, "always"],
@@ -394,7 +366,7 @@ module.exports = {
     // "no-extra-parens": [2, "all", { "conditionalAssign": false, "returnAssign": false, "nestedBinaryExpressions": false }],
 
     // Double quotes should be used.
-    quotes: [2, "double", { avoidEscape: true }],
+    "quotes": [2, "double", { avoidEscape: true }],
 
     // Disallow if as the only statement in an else block.
     "no-lonely-if": 2,
@@ -418,18 +390,14 @@ module.exports = {
     // Disallow unnecessary .call() and .apply()
     "no-useless-call": 2,
 
-    // Require dot notation when accessing properties
-    "dot-notation": 2,
-
     // Disallow named function expressions
     "func-names": [2, "never"],
 
     // Enforce placing object properties on separate lines
     "object-property-newline": [2, { allowMultiplePropertiesPerLine: true }],
 
-    // Do Not Require Object Literal Shorthand Syntax
-    // (Override the parent eslintrc setting for this.)
-    "object-shorthand": "off",
+    // Enforce consistent line breaks inside braces
+    "object-curly-newline": [2, { multiline: true }],
 
     // Disallow whitespace before properties
     "no-whitespace-before-property": 2,
@@ -438,18 +406,15 @@ module.exports = {
     "no-useless-escape": 2,
 
     // Disallow mixes of different operators, but allow simple math operations.
-    "no-mixed-operators": [
-      2,
-      {
-        groups: [
-          /* ["+", "-", "*", "/", "%", "**"], */
-          ["&", "|", "^", "~", "<<", ">>", ">>>"],
-          ["==", "!=", "===", "!==", ">", ">=", "<", "<="],
-          ["&&", "||"],
-          ["in", "instanceof"],
-        ],
-      },
-    ],
+    "no-mixed-operators": [2, {
+      groups: [
+        /* ["+", "-", "*", "/", "%", "**"], */
+        ["&", "|", "^", "~", "<<", ">>", ">>>"],
+        ["==", "!=", "===", "!==", ">", ">=", "<", "<="],
+        ["&&", "||"],
+        ["in", "instanceof"]
+      ]
+    }],
 
     // Disallow unnecessary concatenation of strings
     "no-useless-concat": 2,
@@ -462,6 +427,9 @@ module.exports = {
 
     // Suggest using the spread operator instead of .apply()
     "prefer-spread": 2,
+
+    // Quoting style for property names
+    "quote-props": ["error", "consistent-as-needed", { keywords: true }],
 
     // Disallow negated conditions
     "no-negated-condition": 2,
@@ -476,61 +444,30 @@ module.exports = {
     "no-lone-blocks": 2,
 
     // Enforce minimum identifier length
-    "id-length": [
-      2,
-      {
-        min: 3,
-        exceptions: [
-          /* sorting */
-          "a",
-          "b",
-          /* exceptions */
-          "e",
-          "ex",
-          /* loop indices */
-          "i",
-          "j",
-          "k",
-          "n",
-          /* coordinates */
-          "x",
-          "y",
-          /* regexes */
-          "re",
-          /* known words */
-          "rc",
-          "rv",
-          "id",
-          "OS",
-          "os",
-          "db",
-          "is",
-          /* mail/calendar words */
-          "to",
-          "cc",
-          /* Components */
-          "Ci",
-          "Cc",
-          "Cu",
-          "Cr",
-        ],
-      },
-    ],
+    "id-length": [2, {
+      min: 3,
+      exceptions: [
+        /* jQuery */ "$",
+        /* sorting */ "a", "b",
+        /* exceptions */ "e", "ex",
+        /* loop indices */ "i", "j", "k", "n",
+        /* coordinates */ "x", "y",
+        /* regexes */ "re",
+        /* known words */ "rc", "rv", "id", "OS", "os", "db", "op",
+        /* known html elements */ "tr", "td", "th",
+        /* mail/calendar words */ "to", "cc",
+        /* Components */ "Ci", "Cc", "Cu", "Cr",
+      ]
+    }],
 
     // Disallow lexical declarations in case/default clauses
     "no-case-declarations": 2,
 
+    // Enforce consistent indentation (4-space)
+    "indent": [2, 2, { SwitchCase: 1 }],
+
     // The following rules will not be enabled currently, but are kept here for
     // easier updates in the future.
     "no-else-return": 0,
-  },
-  overrides: [{
-    globals: xpcshellTestConfig.globals,
-    files: ["test/xpcshell/**"],
-    rules: {
-      ...xpcshellTestConfig.rules,
-      "func-names": "off",
-      "mozilla/import-headjs-globals": "error",
-    },
-  }]
+  }
 };

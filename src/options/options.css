@@ -1,13 +1,127 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- * Portions Copyright (C) Philipp Kewisch, 2019 */
+ * Portions Copyright (C) Philipp Kewisch */
 
-html, body {
-	margin-top: 1ex;
-	margin-bottom: 1ex;
+@media (prefers-color-scheme: light) {
+  :root {
+    --menu-color: #18181b;
+    --menu-background-color: white;
+  }
 }
 
-.browser-style > input[type="checkbox"]:checked + label::before {
-  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDE2IDE2Ij4KICA8cGF0aCBkPSJNNy43LDEyLjkgQzcuNCwxMy4zIDYuOCwxMy40IDYuNCwxMyBMMy4yLDkuOCBDMi44LDkuNCAyLjgsOC42IDMuMiw4LjIgQzMuNiw3LjggNC40LDcuOCA0LjgsOC4yIEw2LjksMTAuMyBMMTEuMSw0LjQgQzExLjUsMy45IDEyLjIsMy44IDEyLjcsNC4xIEMxMy4yLDQuNSAxMy4zLDUuMiAxMyw1LjcgTDcuNywxMi45IEw3LjcsMTIuOSBaIiBmaWxsPSIjMDk5NmY4IiAvPgo8L3N2Zz4K);
+@media (prefers-color-scheme: dark) {
+  :root {
+    --menu-color: #f4f4f5;
+    --menu-background-color: #18181b;
+  }
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+    font-family: sans-serif;
+    padding: 20px;
+    font-size: 18px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 1em 0.4em;
+    background-color: var(--menu-background-color);
+    color: var(--menu-color);
+}
+
+.preference {
+  display: contents;
+}
+
+.preference input {
+  justify-self: end;
+}
+
+
+input[type="checkbox"] {
+    border: 1px solid #b1b1b1;
+    background-color: #fff;
+    width: 16px;
+    height: 16px;
+}
+
+input[type="number"] {
+    background-color: #fff;
+    padding: 5px;
+    border: 1px solid #b1b1b1;
+    border-radius: 5px;
+    width: 4.5em;
+}
+button {
+    padding: 10px;
+    font-size: 18px;
+    color: #fff;
+    background-color: #0a84ff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, margin: 0.3s ease;
+}
+button:hover {
+    box-shadow: inset 4px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+select {
+    border: 1px solid #b1b1b1;
+    padding: 5px;
+    border-radius: 5px;
+    background: #fff;
+}
+
+folder-list {
+    max-height: 20em;
+}
+fieldset {
+    width: 100%;
+    min-height: 25em;
+    grid-column: span 2;
+    padding: 10px;
+}
+
+.overflow {
+  position: relative;
+  height: 3em;
+  width: 100%;
+}
+
+.overflow folder-list {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+#folder-picker {
+  width: 100%;
+  background-color: var(--menu-background-color);
+}
+
+
+.panel {
+  display: none;
+  margin-top: 10px;
+}
+.panel.selected {
+  display: block;
+}
+
+#defaultFolderSetting label {
+  margin-inline-end: 10px;
 }
