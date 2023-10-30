@@ -11,7 +11,7 @@ export default class BaseItemList extends HTMLElement {
 
   _defaultItems;
   _allItems = [];
-
+  _startsWith = true;   // MC 2023/10/30 
   ignoreFocus = false;
 
   static get style() {
@@ -476,37 +476,170 @@ export default class BaseItemList extends HTMLElement {
     }
   }
 
-  repopulate() {
-    let lowerSearchTerm = this.searchValue.toLowerCase();
-    this.#clearItems();
-
-    if (lowerSearchTerm) {
-      let searchWords = lowerSearchTerm.split(/\s+/);
-
-      for (let item of this.allItems) {
-        let itemText = this.getItemText(item).toLowerCase();
-        let mismatch = false;
-        for (let word of searchWords) {
-          if (word && !itemText.includes(word)) {
-            mismatch = true;
-            break;
-          }
+    checkFolderInAssistenza(folderNode) {
+        // MC 2023/10/30 
+        //this.logDebug('----------------------------');
+        //this.logDebug('PATH: ' + folderNode.path);
+        //this.logDebug('ACCOUNT ID: ' + folderNode.accountId);
+        //this.logDebug('FOLDER NAME: ' + folderNode.name);
+        //this.logDebug('PARENT: ' + folderNode.parent);
+        if (folderNode.accountId != "account19") {
+            //this.logDebug("Account != account19");
+            //this.logDebug("RESULT: " + false);
+            return false;
+        }
+        // Controllo se l'elemento è nella cartella assistenza
+        let checkAssistenza = folderNode.path.toLowerCase().indexOf("assistenza") >= 0;
+        if (checkAssistenza === false) {
+            // Devo ritornare solo gli elementi che SONO nella cartella assistenza
+            return false;
         }
 
-        if (!mismatch) {
-          this._addItem(item, BaseItemList.MODE_SEARCH);
-        }
-      }
-    } else if (this.defaultItems) {
-      for (let item of this.defaultItems) {
-        this._addItem(item, BaseItemList.MODE_DEFAULT);
-      }
-    } else {
-      for (let item of this.allItems) {
-        this._addItem(item, BaseItemList.MODE_ALL);
-      }
+        // Controllo se l'elemento inizia con la stringa da cercare
+        let sv = this.searchValue.toLowerCase();
+        let itemText = this.getItemText(folderNode).toLowerCase();
+        let checkStarts = itemText.startsWith(sv);
+
+        // Inizia con la stringa da cercare e VOGLIO quelli che iniziano            TRUE
+        // Inizia con la stringa da cercare e NON VOGLIO quelli che iniziano        FALSE
+        // NON Inizia con la stringa da cercare e VOGLIO quelli che iniziano        FALSE
+        // NON Inizia con la stringa da cercare e NON VOGLIO quelli che iniziano    TRUE
+        let check = this._startsWith == checkStarts;
+        return check;
     }
-  }
+
+    checkFolderNotInAssistenza(folderNode) {
+        // MC 2023/10/30 
+        //this.logDebug('----------------------------');
+        //this.logDebug('PATH: ' + folderNode.path);
+        //this.logDebug('ACCOUNT ID: ' + folderNode.accountId);
+        //this.logDebug('FOLDER NAME: ' + folderNode.name);
+        //this.logDebug('PARENT: ' + folderNode.parent);
+        if (folderNode.accountId != "account19") {
+            //this.logDebug("Account != account19");
+            //this.logDebug("RESULT: " + false);
+            return false;
+        }
+        // Controllo se l'elemento è nella cartella assistenza
+        let checkAssistenza = folderNode.path.toLowerCase().indexOf("assistenza") >= 0;
+        if (checkAssistenza === true) {
+            // Devo ritornare solo gli elementi che NON SONO nella cartella assistenza
+            return false;
+        }
+
+        // Controllo se l'elemento inizia con la stringa da cercare
+        let sv = this.searchValue.toLowerCase();
+        let itemText = this.getItemText(folderNode).toLowerCase();
+        let checkStarts = itemText.startsWith(sv);
+
+        // Inizia con la stringa da cercare e VOGLIO quelli che iniziano            TRUE
+        // Inizia con la stringa da cercare e NON VOGLIO quelli che iniziano        FALSE
+        // NON Inizia con la stringa da cercare e VOGLIO quelli che iniziano        FALSE
+        // NON Inizia con la stringa da cercare e NON VOGLIO quelli che iniziano    TRUE
+        let check = this._startsWith == checkStarts;
+        return check;
+    }
+
+    checkGenerico(mode) {
+        // MC 2023/10/30 
+        /*
+        0 NON assistenza, NON startswith
+        1 assistenza, NON startswith
+        2 NON assistenza, startswith
+        3 assistenza, startswith
+        */
+        this._startsWith = false;
+        if (mode >= 2) {
+            this._startsWith = true;
+        }
+        if (mode === 1 || mode === 3) {
+            let ret = this.allItems.filter(this.checkFolderInAssistenza);
+            //this.logDebug("this.allItems: " + this.allItems.length);
+            //this.logDebug("Filtered generico IN ended: " + ret.length);
+            return ret;
+        }
+
+        // MC 2023/10/30 Non uso la filter altrimenti non posso fare riferimento a this
+        let ret = this.allItems.filter(this.checkFolderNotInAssistenza);
+        //this.logDebug("this.allItems: " + this.allItems.length);
+        //this.logDebug("Filtered generico NOT IN ended: " + ret.length);
+        return ret;
+    }
+    checkGenericoItem(item, mode) {
+        // MC 2023/10/30 
+        /*
+        0 assistenza, startswith
+        1 NON assistenza, startswith
+        2 assistenza, NON startswith
+        3 NON assistenza, NON startswith
+        */
+        this._startsWith = false;
+        if (mode <= 1) {
+            this._startsWith = true;
+        }
+        if (mode === 0 || mode === 2) {
+            let ret = this.checkFolderInAssistenza(item);
+            //this.logDebug("checkGenericoItem: " + ret);
+            this.logDebug("checkFolderInAssistenza: " + this._startsWith);
+            return ret;
+        }
+
+        let ret = this.checkFolderNotInAssistenza(item);
+        //this.logDebug("checkGenericoItem: " + ret);
+        this.logDebug("checkFolderNotInAssistenza: " + this._startsWith);
+        return ret;
+    }
+    logDebug(message) {
+        // MC 2023/10/30 
+        //console.log(message);
+    }
+    repopulate() {
+        let lowerSearchTerm = this.searchValue.toLowerCase();
+        this.#clearItems();
+
+        if (lowerSearchTerm) {
+            // MC 2023/10/30 Ciclo da 1 a 4 per ordinare
+            for (let i = 0; i < 4; i++) {
+                this.logDebug("Ciclo: " + i);
+                let searchWords = lowerSearchTerm.split(/\s+/);
+
+                //let filteredItems = this.checkGenerico(i);
+                //this.logDebug("Filtered ended: " + filteredItems.length);
+
+                for (let item of this.allItems) {
+                    if (this.checkGenericoItem(item, i) === false) {
+                        //this.logDebug("Continue");
+                        continue;
+                    }
+                    let itemText = this.getItemText(item).toLowerCase();
+                    //this.logDebug("itemText: " + this.getItemText(item));
+                    let mismatch = false;
+                    for (let word of searchWords) {
+                        //this.logDebug("word: " + word);
+                        if (word && !itemText.includes(word)) {
+                            //this.logDebug("MISMATCH: " + this.getItemText(item));
+                            mismatch = true;
+                            break;
+                        }
+                    }
+
+                    if (!mismatch) {
+                        this.logDebug("ADDITEM: " + this.getItemText(item));
+                        this._addItem(item, BaseItemList.MODE_SEARCH);
+                    }
+                }
+
+            }
+        } else if (this.defaultItems) {
+            for (let item of this.defaultItems) {
+                this._addItem(item, BaseItemList.MODE_DEFAULT);
+            }
+        } else {
+            for (let item of this.allItems) {
+                this._addItem(item, BaseItemList.MODE_ALL);
+            }
+        }
+    }
 }
 
 BaseItemList.MODE_SEARCH = 1;
