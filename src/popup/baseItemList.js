@@ -499,7 +499,11 @@ export default class BaseItemList extends HTMLElement {
         let sv = this.searchValue.toLowerCase();
         let itemText = this.getItemText(folderNode).toLowerCase();
         let checkStarts = itemText.startsWith(sv);
-
+        if (checkStarts == false) {
+            // Se non inizia con la stringa cercata, provo a vedere se una sua parola inizia con quella stringa
+            // Per farlo aggiungo uno spazio davanti alle lettere da cercare
+            checkStarts = itemText.indexOf(" " + sv) > 0;
+        }
         // Inizia con la stringa da cercare e VOGLIO quelli che iniziano            TRUE
         // Inizia con la stringa da cercare e NON VOGLIO quelli che iniziano        FALSE
         // NON Inizia con la stringa da cercare e VOGLIO quelli che iniziano        FALSE

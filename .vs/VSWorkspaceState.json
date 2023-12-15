@@ -1,8 +1,11 @@
 {
   "ExpandedNodes": [
     "",
-    "\\dist",
-    "\\src"
+    "\\src",
+    "\\src\\common",
+    "\\src\\options",
+    "\\src\\popup"
   ],
+  "SelectedNode": "\\src\\popup\\baseItemList.js",
   "PreviewInSolutionExplorer": false
 }

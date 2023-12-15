@@ -1,7 +1,7 @@
 SET Path7Z=C:\Program Files\7-Zip\7z.exe
 
 REM Nome file da creare
-SET zipFile=quickmove-2.8.0.1.xpi
+SET zipFile=quickmove-2.8.0.2.xpi
 SET fullZipFilePath=%USERPROFILE%\desktop\%zipFile%
 
 del %fullZipFilePath%
