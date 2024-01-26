@@ -542,7 +542,7 @@ export default class BaseItemList extends HTMLElement {
         // NON Inizia con la stringa da cercare e NON VOGLIO quelli che iniziano    TRUE
         let check = this._startsWith == checkStarts;
         return check;
-    }
+  }
 
     checkGenerico(mode) {
         // MC 2023/10/30 
@@ -597,53 +597,53 @@ export default class BaseItemList extends HTMLElement {
         // MC 2023/10/30 
         //console.log(message);
     }
-    repopulate() {
-        let lowerSearchTerm = this.searchValue.toLowerCase();
-        this.#clearItems();
+  repopulate() {
+    let lowerSearchTerm = this.searchValue.toLowerCase();
+    this.#clearItems();
 
-        if (lowerSearchTerm) {
+    if (lowerSearchTerm) {
             // MC 2023/10/30 Ciclo da 1 a 4 per ordinare
             for (let i = 0; i < 4; i++) {
                 this.logDebug("Ciclo: " + i);
-                let searchWords = lowerSearchTerm.split(/\s+/);
+      let searchWords = lowerSearchTerm.split(/\s+/);
 
                 //let filteredItems = this.checkGenerico(i);
                 //this.logDebug("Filtered ended: " + filteredItems.length);
 
-                for (let item of this.allItems) {
+      for (let item of this.allItems) {
                     if (this.checkGenericoItem(item, i) === false) {
                         //this.logDebug("Continue");
                         continue;
                     }
-                    let itemText = this.getItemText(item).toLowerCase();
+        let itemText = this.getItemText(item).toLowerCase();
                     //this.logDebug("itemText: " + this.getItemText(item));
-                    let mismatch = false;
-                    for (let word of searchWords) {
+        let mismatch = false;
+        for (let word of searchWords) {
                         //this.logDebug("word: " + word);
-                        if (word && !itemText.includes(word)) {
+          if (word && !itemText.includes(word)) {
                             //this.logDebug("MISMATCH: " + this.getItemText(item));
-                            mismatch = true;
-                            break;
-                        }
-                    }
+            mismatch = true;
+            break;
+          }
+        }
 
-                    if (!mismatch) {
+        if (!mismatch) {
                         this.logDebug("ADDITEM: " + this.getItemText(item));
-                        this._addItem(item, BaseItemList.MODE_SEARCH);
-                    }
+          this._addItem(item, BaseItemList.MODE_SEARCH);
+        }
                 }
 
-            }
-        } else if (this.defaultItems) {
-            for (let item of this.defaultItems) {
-                this._addItem(item, BaseItemList.MODE_DEFAULT);
-            }
-        } else {
-            for (let item of this.allItems) {
-                this._addItem(item, BaseItemList.MODE_ALL);
-            }
-        }
+      }
+    } else if (this.defaultItems) {
+      for (let item of this.defaultItems) {
+        this._addItem(item, BaseItemList.MODE_DEFAULT);
+      }
+    } else {
+      for (let item of this.allItems) {
+        this._addItem(item, BaseItemList.MODE_ALL);
+      }
     }
+  }
 }
 
 BaseItemList.MODE_SEARCH = 1;
