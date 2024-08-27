@@ -26,15 +26,15 @@ async function spinWith(func, ...args) {
   let rv;
   try {
     gSpinLevel++;
-    await browser.browserAction.setIcon({ path: "/images/spinner.svg" });
-    await browser.messageDisplayAction.setIcon({ path: "/images/spinner.svg" });
+    browser.browserAction.setIcon({ path: "/images/spinner.svg" });
+    browser.messageDisplayAction.setIcon({ path: "/images/spinner.svg" });
     rv = await func(...args);
   } finally {
     gSpinLevel--;
 
     if (gSpinLevel == 0) {
-      await browser.browserAction.setIcon({ path: "/images/addon.svg" });
-      await browser.messageDisplayAction.setIcon({ path: "/images/addon.svg" });
+      browser.browserAction.setIcon({ path: "/images/addon.svg" });
+      browser.messageDisplayAction.setIcon({ path: "/images/addon.svg" });
     }
   }
 
@@ -50,6 +50,14 @@ async function processSelectedMessages(folder, operation="move") {
   if (!tab) {
     return;
   }
+
+  // TB120 COMPAT
+  let browserInfo = await browser.runtime.getBrowserInfo();
+  let folderId = folder.id;
+  if (parseInt(browserInfo.version.split(".")[0], 10) < 121) {
+    folderId = folder;
+  }
+
 
   let messagePages;
   if (tab.type == "messageDisplay") {
@@ -67,7 +75,7 @@ async function processSelectedMessages(folder, operation="move") {
     if (markAsRead) {
       op = op.then(() => Promise.all(ids.map(id => browser.messages.update(id, { read: true }))));
     }
-    op = op.then(() => browser.messages[operation](ids, folder));
+    op = op.then(() => browser.messages[operation](ids, folderId));
     ops.push(op);
   }
 
