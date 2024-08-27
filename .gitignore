@@ -3,3 +3,6 @@ node_modules
 web-ext-artifacts
 .vs
 /.vs/quickmove-extension/FileContentIndex/f0542267-ae95-4a48-998b-3a84baeda45f.vsidx
+/.vs/quickmove-extension/v17/.wsuo
+/.vs/slnx.sqlite
+/.vs/VSWorkspaceState.json
